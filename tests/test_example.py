@@ -194,7 +194,8 @@ async def test_more_structs(mock_clock):
         assert await dev.foo.get_plover(2) == 9
 
 
-async def test_coupler_server():
+async def test_coupler_server(mock_clock):
+    mock_clock.autojump_threshold = 0.1
     e1 = EventChecker(  # pylint: disable=unused-variable
         [
             ServerRegistered,
@@ -259,7 +260,7 @@ async def test_slow_server(mock_clock):
         ]
     )
     async with server(
-        events=e1, tree=basic_tree, options={"slow_every": [0, 0, 15, 0, 0]}
+        events=e1, tree=basic_tree, options={"slow_every": [0, 0, 5, 0, 0]}
     ):  # as ow:
         await trio.sleep(0)
 
