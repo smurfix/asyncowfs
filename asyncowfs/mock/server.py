@@ -160,7 +160,8 @@ async def some_server(tree, options, socket):
             except OWFSReplyError as err:
                 logger.info("Error: %s", err)
                 await rdr.write(
-                    -err.err, format_flags  # pylint: disable=invalid-unary-operand-type
+                    -err.err,  # pylint: disable=invalid-unary-operand-type
+                    format_flags,
                 )
 
     except anyio.ClosedResourceError:
@@ -220,7 +221,9 @@ class EventChecker:
     def check_last(self):
         logger.debug("Event END")
         if self.pos != len(self.events):
-            raise RuntimeError("Superfluous event #%d: %s" % (self.pos, self.events[self.pos]))
+            raise RuntimeError(
+                "Superfluous event #%d: %s" % (self.pos, self.events[self.pos])
+            )
 
 
 @asynccontextmanager
@@ -257,7 +260,9 @@ async def server(  # pylint: disable=dangerous-default-value  # intentional
                     evt = anyio.Event()
                     tg.start_soon(events, ow, evt)
                     await evt.wait()
-                addr = listener.extra(anyio.abc.SocketAttribute.raw_socket).getsockname()
+                addr = listener.extra(
+                    anyio.abc.SocketAttribute.raw_socket
+                ).getsockname()
                 tg.start_soon(may_close)
 
                 s = await ow.add_server(

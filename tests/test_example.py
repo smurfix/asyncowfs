@@ -2,7 +2,7 @@ import trio
 import pytest
 from copy import deepcopy
 
-from moat.util import ungroup,exc_iter
+from moat.util import ungroup, exc_iter
 
 import anyio
 
@@ -67,21 +67,25 @@ coupler_tree = {
 
 
 async def test_empty_server():
-    e1 = EventChecker([ServerRegistered, ServerConnected, ServerDisconnected, ServerDeregistered])
+    e1 = EventChecker(
+        [ServerRegistered, ServerConnected, ServerDisconnected, ServerDeregistered]
+    )
     async with server(events=e1):  # as ow:
         await trio.sleep(0)
 
 
 async def test_send_idle(mock_clock):
     mock_clock.autojump_threshold = 0.1
-    e1 = EventChecker([ServerRegistered, ServerConnected, ServerDisconnected, ServerDeregistered])
+    e1 = EventChecker(
+        [ServerRegistered, ServerConnected, ServerDisconnected, ServerDeregistered]
+    )
     async with server(events=e1):  # as ow:
         await trio.sleep(15)
 
 
 async def test_missing_event():
     e1 = EventChecker([ServerRegistered, ServerConnected, ServerDisconnected])
-    with pytest.raises((RuntimeError,ExceptionGroup)) as r, ungroup:
+    with pytest.raises((RuntimeError, ExceptionGroup)) as r, ungroup:
         async with server(events=e1):  # as ow:
             await trio.sleep(0)
 
@@ -111,8 +115,10 @@ async def test_more_event():
 
 
 async def test_bad_event():
-    e1 = EventChecker([ServerRegistered, ServerConnected, ServerConnected, ServerDeregistered])
-    with pytest.raises((RuntimeError,ExceptionGroup)) as r:
+    e1 = EventChecker(
+        [ServerRegistered, ServerConnected, ServerConnected, ServerDeregistered]
+    )
+    with pytest.raises((RuntimeError, ExceptionGroup)) as r:
         async with server(events=e1):  # as ow:
             await trio.sleep(0)
     for e in exc_iter(r.value):
@@ -122,8 +128,6 @@ async def test_bad_event():
             pass
         else:
             raise
-
-
 
 
 async def test_basic_server():
@@ -155,7 +159,11 @@ async def test_basic_structs(mock_clock):
     mock_clock.autojump_threshold = 0.1
     async with server(
         tree=basic_tree,
-        options={"slow_every": [0, 2, 0.1], "busy_every": [0, 0, 1], "close_every": [0, 0, 0, 1]},
+        options={
+            "slow_every": [0, 2, 0.1],
+            "busy_every": [0, 0, 1],
+            "close_every": [0, 0, 0, 1],
+        },
     ) as ow:
         await trio.sleep(0)
         dev = await ow.get_device("10.345678.90")
@@ -257,7 +265,7 @@ async def test_wrong_bus():
             ServerDeregistered,
         ]
     )
-    with pytest.raises((RuntimeError,ExceptionGroup)) as r:
+    with pytest.raises((RuntimeError, ExceptionGroup)) as r:
         async with server(events=e1, tree=basic_tree):  # as ow:
             await trio.sleep(0)
     for e in exc_iter(r.value):
@@ -267,8 +275,6 @@ async def test_wrong_bus():
             pass
         else:
             raise
-
-
 
 
 async def test_slow_server(mock_clock):
@@ -333,7 +339,8 @@ async def test_disconnecting_server():
         ]
     )
     async with server(
-        tree=basic_tree, options={"close_every": [0, 0, 0, 1]}  # events=e1,
+        tree=basic_tree,
+        options={"close_every": [0, 0, 0, 1]},  # events=e1,
     ):  # as ow:
         await trio.sleep(0)
 
@@ -360,7 +367,8 @@ async def test_disconnecting_server_2(mock_clock):
         ]
     )
     async with server(
-        tree=basic_tree, options={"close_every": [0, 0, 1, 0, 0]}  # events=e1, tree=basic_tree,
+        tree=basic_tree,
+        options={"close_every": [0, 0, 1, 0, 0]},  # events=e1, tree=basic_tree,
     ):  # as ow:
         await trio.sleep(0)
 
@@ -466,7 +474,9 @@ async def test_manual_bus(mock_clock):
             ServerDeregistered,
         ]
     )
-    async with server(tree=basic_tree, scan=None, initial_scan=False) as ow:  # events=e1,
+    async with server(
+        tree=basic_tree, scan=None, initial_scan=False
+    ) as ow:  # events=e1,
         bus = await ow.test_server.get_bus("bus.0")
         assert bus.server == ow.test_server
 
