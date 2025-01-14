@@ -117,7 +117,9 @@ class MessageProtocol:
             hdr = await self._read_buf(24)
         except anyio.EndOfStream:
             raise StopAsyncIteration  # pylint: disable=raise-missing-from
-        version, payload_len, ret_value, format_flags, data_len, offset = struct.unpack("!6i", hdr)
+        version, payload_len, ret_value, format_flags, data_len, offset = struct.unpack(
+            "!6i", hdr
+        )
         if offset & 0x8000:
             offset = 0
         if version != 0:

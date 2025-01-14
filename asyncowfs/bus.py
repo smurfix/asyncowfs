@@ -229,7 +229,6 @@ class Bus:
             else:
                 await p(simul=True)
 
-
     def poll_temperature(self):
         """Read all temperature data"""
         return self._poll_simul("temperature", 1.2)

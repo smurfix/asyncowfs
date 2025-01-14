@@ -233,7 +233,6 @@ async def setup_accessors(server, cls, typ, *subdir):
         try:
             v = await server.attr_get("structure", typ, *dd)
         except IsDirError:
-
             t = typ
 
             class SubPath(SubDir):
@@ -378,7 +377,7 @@ class Device(SubDir):
         """Return queued events. Shall be called exactly once."""
         e, self._events = self._events, None
         if e is None:
-            raise RuntimeError("You cannot call `queued_events` " "more than once")
+            raise RuntimeError("You cannot call `queued_events` more than once")
         return iter(e)
 
     @classmethod
@@ -538,7 +537,9 @@ class Device(SubDir):
                 else:
                     s = getattr(s, pp)
             if isinstance(n, int) or hasattr(s, "get_" + n):
-                self._poll[typ] = await self.service.add_task(self._poll_task, s, n, typ, value)
+                self._poll[typ] = await self.service.add_task(
+                    self._poll_task, s, n, typ, value
+                )
 
             else:
                 raise RuntimeError("%r: No poll for %s" % (self, typ))
@@ -621,7 +622,9 @@ class TemperatureDevice(Device):
 
     async def poll_temperature(self, simul=False):
         # Bug workaround
-        t = await (self.latesttemp if simul and len(self.bus.path)<=1 else self.temperature)
+        t = await (
+            self.latesttemp if simul and len(self.bus.path) <= 1 else self.temperature
+        )
         if t == 85:
             logger.error("TEMP: got 85 on %r", self)
             return

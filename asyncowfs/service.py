@@ -106,7 +106,9 @@ class Service:
             await self.push_event(ServerDeregistered(s))
             raise
         self._servers.add(s)
-        await s.start_scan(scan=scan, initial_scan=initial_scan, polling=polling, random=random)
+        await s.start_scan(
+            scan=scan, initial_scan=initial_scan, polling=polling, random=random
+        )
         return s
 
     async def ensure_struct(self, dev, server=None, maybe=False):
@@ -228,7 +230,9 @@ class Service:
 
             async def __aenter__(slf):
                 assert self._event_queue is None
-                self._event_queue, slf._q_r = anyio.create_memory_object_stream(1000)  # bus events
+                self._event_queue, slf._q_r = anyio.create_memory_object_stream(
+                    1000
+                )  # bus events
                 return slf
 
             async def __aexit__(slf, *tb):

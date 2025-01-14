@@ -322,7 +322,9 @@ class Server:
         :param polling: Flag whether to start tasks for periodic polling
             (alarm handling, temperature, …). Defaults to ``True``.
         """
-        self._scan_args = dict(scan=scan, initial_scan=False, polling=polling, random=random)
+        self._scan_args = dict(
+            scan=scan, initial_scan=False, polling=polling, random=random
+        )
         if not scan and not initial_scan:
             return
         if scan and scan < 1:
